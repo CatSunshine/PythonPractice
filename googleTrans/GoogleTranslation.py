@@ -1,5 +1,7 @@
 import urllib.request    
-from HandleJs import Py4Js    
+from HandleJs import Py4Js
+import re
+import time
     
 def open_url(url):    
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}      
@@ -20,23 +22,52 @@ def translate(content,tk):
     #返回值是一个多层嵌套列表的字符串形式，解析起来还相当费劲，写了几个正则，发现也很不理想，  
     #后来感觉，使用正则简直就是把简单的事情复杂化，这里直接切片就Ok了    
     result = open_url(url)
-    print(url)
-    print(result)
+    #print(url)
+    #print(result)
     end = result.find("\",")    
     if end > 4:    
-        print(result[4:end])    
+        return (result[4:end])
+
+def readContent(fileName):
+    content = ''
+    fileHandler = open(fileName)
+    lines = fileHandler.readlines()
+
+    for line in lines:
+        content += line
+    fileHandler.close()
+    return content
+
+def getSentences(content):
+    sentences = re.split('[.!?]+', content)
+    for sentence in sentences:
+        print(sentence)
+    return sentences
     
 def main():    
     js = Py4Js()    
         
-    while 1:    
-        content = input("输入待翻译内容：")    
+    #while 1:    
+    #   content = input("输入待翻译内容：")    
             
-        if content == 'q!':    
-            break    
-            
-        tk = js.getTk(content)    
-        translate(content,tk)    
-        
+     #   if content == 'q!':    
+      #      break    
+    content = readContent('.\\source.txt')
+    print(content)
+    print(30*'*')
+    sentences = getSentences(content)
+    rs = open('result.txt', 'w', encoding = 'utf-8')
+    for sentence in sentences:
+        tk = js.getTk(sentence)
+        result = translate(sentence,tk)
+        print(300*'*')
+        print(result)
+        if result:
+            rs.write(result)
+        time.sleep(0.3)
+
+    rs.close()
+    
+    
 if __name__ == "__main__":    
     main() 
