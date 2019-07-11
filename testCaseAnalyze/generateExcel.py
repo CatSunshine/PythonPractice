@@ -150,15 +150,50 @@ def saveSection(left, right, wantedCases, sht, rows):
                 rows = addNewCase(sht, rows, wantedCase) #different case
                 #print("add new case, row = ", rows)
     return rows
-                    
-def generateExcel():
+
+def generateRerunCmd():
+    wantedCases = getResult()
+    generateCmd(wantedCases)
+    
+#generateTestSuite -t sbpsC2_TC3_L -a 40
+def generateCmd(wantedCases):
+    outCmd = open('rerunCmd.txt', 'w')
+    prevLevelOneType = wantedCases[0].levelOneType
+    prevTerminal = wantedCases[0].terminal
+    suite = wantedCases[0].testSuite
+    caseStr = ' -t ' + wantedCases[0].caseName.strip()
+    caseCount = 1
+    for wantedCase in wantedCases[1:]:
+        if wantedCase.levelOneType == prevLevelOneType: #same TP and xml suite
+            caseStr += ' -t ' + wantedCase.caseName.strip()
+            caseCount += 1
+        else:
+            if caseCount < 10:
+                outCmd.write('generateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+                outCmd.write('\n')
+            else:
+                outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
+                outCmd.write('\n')
+            prevLevelOneType = wantedCase.levelOneType
+            prevTerminal = wantedCase.terminal
+            caseStr = ' -t ' + wantedCase.caseName.strip()
+            caseCount = 1
+            suite = wantedCase.testSuite
+    if caseCount < 10:
+        outCmd.write('generateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+        outCmd.write('\n')
+    else:
+        outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
+        outCmd.write('\n')
+    outCmd.close()   
+    
+def generateExcel(wantedCases):
     print('start!')
     app = xw.App(visible=False, add_book=False)
     wb = app.books.add()
     sht = wb.sheets['sheet1']
     sht.autofit()
-    
-    wantedCases = getResult()
+        
     print('get result finished!')
     saveSections(wantedCases, sht)
     
@@ -172,7 +207,14 @@ def getResult():
     analyzeLog.process()
     return analyzeLog.testcaseList
 
-generateExcel()
+wantedCases = getResult()
+#generateExcel(wantedCases)
+generateCmd(wantedCases)
+
+#todo:different xml suite set different case count
+#todo:no-matching part
+#todo:add TR number and link
+
 '''
 app = xw.App(visible=False, add_book=False)
 wb = app.books.add()
