@@ -5,7 +5,7 @@ class Testcase:
         self.link = ''
         self.leftStatus = ''
         self.rightStatus=''
-        self.errorMsg = ''
+        self.errorMsg = []
         self.testSuite = ''
         self.terminal = 0
         self.radioType = ''
@@ -17,7 +17,7 @@ class Testcase:
     def toString(self):
         print('testSuite:',self.testSuite,'terminal:',self.terminal,'radioType:',self.radioType,
               'className:',self.className,'leftStatus:', self.leftStatus,'rightStatus:',self.rightStatus,
-              'link:',self.link,'caseName:',self.caseName,'errorMsg:',self.errorMsg, 'trNum:',self.trNum,
+              'link:',self.link,'caseName:',self.caseName,'errorMsg:',''.join(self.errorMsg), 'trNum:',self.trNum,
               'trlink:', self.trlink,'levelOneType:',self.levelOneType, 'levelTwoType:',self.levelTwoType)
 '''
 tc1 = Testcase()

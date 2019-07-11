@@ -5,58 +5,70 @@ def titleStyle(rng):
     rng.api.Font.Bold = True
     rng.api.Font.Color = 0x0000ff
 
+
 def suiteStype(rng):
     rng.api.Font.size = 14
     rng.api.Font.Bold = True
-    rng.api.Font.Color = 0xff00ff
-
+    rng.api.Font.Color = 0x000000
+    
 def classStype(rng):
-    rng.api.Font.size = 10
+    rng.api.Font.size = 12
     rng.api.Font.Bold = False
-    rng.api.Font.Color = 0x00ff00
+    rng.api.Font.Color = 0x000000
 
 def addNewTitle(sht, rows, wantedCase):
     sht.range('A'+str(rows)).value = wantedCase.testSuite
+    suiteStype(sht.range('A'+str(rows)))
     sht.range('B'+str(rows)).value = wantedCase.radioType + ' Terminal ' + str(wantedCase.terminal)
+    suiteStype(sht.range('B'+str(rows)))
     rows += 1
     sht.range('A'+str(rows)).value = wantedCase.className
+    classStype(sht.range('A'+str(rows)))
     rows += 1
     #sht.range('A'+str(rows)).value = wantedCase.caseName
     print(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link)
     sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
-    sht.range('B'+str(rows)).value = wantedCase.errorMsg
+    sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
     return rows+1
 
 def addNewClass(sht, rows, wantedCase):
     sht.range('A'+str(rows)).value = wantedCase.className
+    classStype(sht.range('A'+str(rows)))
     rows += 1
     #sht.range('A'+str(rows)).value = wantedCase.caseName
     sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
-    sht.range('B'+str(rows)).value = wantedCase.errorMsg
+    sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
     return rows+1
 
 def addNewCase(sht, rows, wantedCase):
     #sht.range('A'+str(rows)).value = wantedCase.caseName
     print(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link)
     sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
-    sht.range('B'+str(rows)).value = wantedCase.errorMsg
+    sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
     return rows+1
 
-def saveSections(wantedCases, sht):
+def saveSections(wantedCases, sht):   
+    a1 = sht.range('A1')
+    a1.column_width = 50
+    b1 = sht.range('B1')
+    b1.column_width = 100
+
+    #sht.range("A1:A20").columns.autofit()
     rows = 1
+    
     rng = sht.range('A' + str(rows))
     rng.value = 'Pass to Fail'
     titleStyle(rng)
-    #rng.autofit()
     rows += 1
     rows = saveSection('r_pass', 'r_fail', wantedCases, sht, rows)
+    
     
     rng = sht.range('A' + str(rows))
     rng.value = 'Pass to Error'
     titleStyle(rng)
     rows += 1
     rows = saveSection('r_pass', 'r_error', wantedCases, sht, rows)
-    
+
     rng = sht.range('A' + str(rows))
     rng.value='Pass to not Executed'
     titleStyle(rng)
@@ -110,7 +122,6 @@ def saveSections(wantedCases, sht):
     titleStyle(rng)
     rows += 1
     rows = saveSection('r_fail', 'r_missing', wantedCases, sht, rows)
-    #sht.range('A1:A'+rows).api.height = 200
     
 def saveSection(left, right, wantedCases, sht, rows):    
     print("rows = ", rows)
@@ -125,18 +136,19 @@ def saveSection(left, right, wantedCases, sht, rows):
                 prevLevelOneType = wantedCase.levelOneType
                 prevLevelTwoType = wantedCase.levelTwoType                
                 flag = True
-                print("first add new title, row = ", rows)
+                #print("first add new title, row = ", rows)
             elif prevLevelOneType != wantedCase.levelOneType: #different xml and TP
                 rows = addNewTitle(sht, rows, wantedCase)
                 prevLevelOneType = wantedCase.levelOneType
                 prevLevelTwoType = wantedCase.levelTwoType
-                print("add new title, row = ", rows)
+                #print("add new title, row = ", rows)
             elif prevLevelTwoType != wantedCase.levelTwoType: #different class
                 rows = addNewClass(sht, rows, wantedCase)
-                print("add new class, row = ", rows)
+                prevLevelTwoType = wantedCase.levelTwoType
+                #print("add new class, row = ", rows)
             else:
-                rows = addNewCase(sht, rows, wantedCase)
-                print("add new class, row = ", rows)
+                rows = addNewCase(sht, rows, wantedCase) #different case
+                #print("add new case, row = ", rows)
     return rows
                     
 def generateExcel():
@@ -144,7 +156,7 @@ def generateExcel():
     app = xw.App(visible=False, add_book=False)
     wb = app.books.add()
     sht = wb.sheets['sheet1']
-    #sht.range('A1:B1').api.width = 400
+    sht.autofit()
     
     wantedCases = getResult()
     print('get result finished!')
@@ -158,12 +170,7 @@ def generateExcel():
 def getResult():
     analyzeLog = AnalyzeLog()
     analyzeLog.process()
-    wantedCases = []
-    for testcase in analyzeLog.testcaseList:
-        if testcase.rightStatus != 'r_pass':
-            wantedCases.append(testcase)
-    return wantedCases
-
+    return analyzeLog.testcaseList
 
 generateExcel()
 '''

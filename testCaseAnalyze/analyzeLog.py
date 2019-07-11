@@ -74,48 +74,57 @@ class AnalyzeLog:
             while type(next_a)!= type(li.a):
                 next_a = next_a.nextSibling
             tc.rightStatus = next_a.span['class'][0]
+            if tc.rightStatus == 'r_pass': #today the case passed, not record.
+                continue
             tc.link = next_a['href']
             tc.caseName = next_a.span.string
             errorlis = li.find_all(name='li')
             #print('errlist:', len(errorlis))
             if errorlis:
                 for errli in errorlis:
+                    errorMsg = ''
                     spans = errli.find_all(name='span')
                     #print('span len:',len(spans))
                     for span in spans:
                         #print("single span:",span)
                         if len(span.attrs) > 0 and span['class'][0] == 'known_issue':
-                            tc.errorMsg += span.a.string + '\n'
+                            errorMsg = span.a.string + '\n'
+                            #tc.errorMsg += span.a.string + '\n'
                             #print('first a type:',type(span.a))
                             #print("span a:", span.a)
                             next_t = span.a.nextSibling
-                            while type(next_t)!=type(span.a):
+                            if not next_t:
+                                continue
+                            while type(next_t)!=type(span.a) and next_t.nextSibling:
                                 next_t = next_t.nextSibling
                             #print("next:",next_t)
                             #print('second a type:',type(next_t))
-                            tc.trlink = next_t['href']
+                            if type(next_t)==type(span.a):
+                                tc.trlink = next_t['href']
                         elif len(span.attrs) > 0 and span['class'][0] == 'tr':
                             tc.trNum = span.string
                         else:
-                            tc.errorMsg += span.string+'\n'
+                            errorMsg = span.string + '\n'
+                            #tc.errorMsg += span.string+'\n'
+                    if errorMsg not in tc.errorMsg:
+                        tc.errorMsg.append(errorMsg)
             #tc.toString()
             self.testcaseList.append(tc)
 
     def process(self):
         nodes = self.logDiffNodes()
         i = 0
-        #self.processNode(nodes[8])
+        #self.processNode(nodes[4])
         for node in nodes:
             print(i)
             self.processNode(node)
             i += 1
             
-'''        
+'''      
 analyzeLog = AnalyzeLog()
 analyzeLog.process()
 for testcase in analyzeLog.testcaseList:
-    if testcase.leftStatus=='r_pass':
-        testcase.toString()
+    testcase.toString()
 '''
 
 
