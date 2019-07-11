@@ -1,3 +1,6 @@
+__author__ = "Wendy.wu.a@ericsson.com"
+__version__ = "1.0.1"
+
 from bs4 import BeautifulSoup
 from Testcase import Testcase
 #1.open html, get bs4, get log-diff nodes

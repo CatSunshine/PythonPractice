@@ -1,5 +1,10 @@
+__author__ = "Wendy.wu.a@ericsson.com"
+__version__ = "1.0.1"
+
 import xlwings as xw
 from analyzeLog import AnalyzeLog
+import sys
+
 def titleStyle(rng):
     rng.api.Font.size = 16
     rng.api.Font.Bold = True
@@ -22,29 +27,21 @@ def addNewTitle(sht, rows, wantedCase):
     sht.range('B'+str(rows)).value = wantedCase.radioType + ' Terminal ' + str(wantedCase.terminal)
     suiteStype(sht.range('B'+str(rows)))
     rows += 1
-    sht.range('A'+str(rows)).value = wantedCase.className
-    classStype(sht.range('A'+str(rows)))
-    rows += 1
-    #sht.range('A'+str(rows)).value = wantedCase.caseName
-    print(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link)
-    sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
-    sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
-    return rows+1
+    return addNewClass(sht, rows, wantedCase)
 
 def addNewClass(sht, rows, wantedCase):
     sht.range('A'+str(rows)).value = wantedCase.className
     classStype(sht.range('A'+str(rows)))
     rows += 1
-    #sht.range('A'+str(rows)).value = wantedCase.caseName
-    sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
-    sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
-    return rows+1
+    return addNewCase(sht, rows, wantedCase)
 
 def addNewCase(sht, rows, wantedCase):
     #sht.range('A'+str(rows)).value = wantedCase.caseName
-    print(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link)
+    #print(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link)
     sht.range('A'+str(rows)).add_hyperlink(r'https://ki81fw4.rnd.ki.sw.ericsson.se'+wantedCase.link, wantedCase.caseName,'')
     sht.range('B'+str(rows)).value = ''.join(wantedCase.errorMsg)
+    if wantedCase.trlink:
+        sht.range('C' + str(rows)).add_hyperlink(wantedCase.trlink, wantedCase.trNum, '')
     return rows+1
 
 def saveSections(wantedCases, sht):   
@@ -52,7 +49,8 @@ def saveSections(wantedCases, sht):
     a1.column_width = 50
     b1 = sht.range('B1')
     b1.column_width = 100
-
+    c1 = sht.range('C1')
+    c1.column_width = 10
     #sht.range("A1:A20").columns.autofit()
     rows = 1
     
@@ -187,7 +185,7 @@ def generateCmd(wantedCases):
         outCmd.write('\n')
     outCmd.close()   
     
-def generateExcel(wantedCases):
+def generateExcel(wantedCases, excelName):
     print('start!')
     app = xw.App(visible=False, add_book=False)
     wb = app.books.add()
@@ -197,7 +195,7 @@ def generateExcel(wantedCases):
     print('get result finished!')
     saveSections(wantedCases, sht)
     
-    wb.save('result.xlsx')
+    wb.save(excelName + '.xlsx')
     wb.close()
     app.quit()
     print('finished!')
@@ -207,13 +205,25 @@ def getResult():
     analyzeLog.process()
     return analyzeLog.testcaseList
 
-wantedCases = getResult()
-#generateExcel(wantedCases)
-generateCmd(wantedCases)
+#wantedCases = getResult()
+#generateExcel(wantedCases, 'R78Result')
+#generateCmd(wantedCases)
 
+def main(argv = None):
+    if argv is None:
+        argv = sys.argv
+    if len(argv)<2:
+        print('please input a excel name.')
+    else:
+        wantedCases = getResult()
+        generateExcel(wantedCases, argv[1])
+        generateCmd(wantedCases)
+
+if __name__ == '__main__':
+    main()
 #todo:different xml suite set different case count
 #todo:no-matching part
-#todo:add TR number and link
+#todo:add TR number and link --ok
 
 '''
 app = xw.App(visible=False, add_book=False)
