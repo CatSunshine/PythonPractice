@@ -17,11 +17,58 @@ class AnalyzeLog:
         self.className = ''
         self.levelOneType = 0
         self.levelTwoType = 0
-        
+        self.leftNonMatch = []
+        self.rightNonMatch = []
+
+    def getSplitInfo(self, line):
+        single = []
+        lst = line.string.split('-')
+        single.append(lst[1].strip())
+        start = lst[2].find('(')
+        end = lst[2].find(')')
+        single.append(lst[2][start+1:end])
+        start = lst[2].find('Terminal')
+        temp = lst[2][start:]
+        templst = temp.split(' ')
+        single.append(int(templst[1]))
+        return single
+    
+    def getLeftNonMatch(self, node):
+        count = node.p.string.split(' ')[0].strip()
+        if count != '0':
+            next_li = node.nextSibling
+            while type(next_li)!= type(node):
+                next_li = next_li.nextSibling
+            #print(next_li)
+            lblbls = next_li.find_all(name='li', attrs={'class':'lblbl'})
+            #print('length:',len(lblbls))
+            for lblbl in lblbls:
+                single = self.getSplitInfo(lblbl)
+                self.leftNonMatch.append(single)
+        #print(self.leftNonMatch)
+ 
+    def getRightNonMatch(self, node):
+        count = node.p.string.split(' ')[0].strip()
+        if count != '0':
+            next_li = node.nextSibling
+            while type(next_li)!= type(node):
+                next_li = next_li.nextSibling
+            #print(next_li)
+            uls = next_li.find_all(name='ul',attrs={'class':'header test_container'})
+            #print("len ul", len(uls))
+            for ul in uls:
+                if ul.li.a.span['class'][0]!='r_pass':
+                    link = ul.li.a['href']
+                    single = self.getSplitInfo(ul.find(name='li', attrs={'class':'lblbl'}).string)
+                    single.append(link)
+                    self.rightNonMatch.append(single)
+            #print(self.rightNonMatch)  
+    
     def logDiffNodes(self):
         doc = open('log_diffs', 'r')
         soup = BeautifulSoup(doc, 'html.parser')
-        #print(soup.prettify())
+        self.getLeftNonMatch(soup.find(name='li', attrs={'class':'secondary secondary_testable'}))
+        self.getRightNonMatch(soup.find(name='li', attrs={'class':'primary primary_testable'}))
         divs = soup.find_all(name='div', attrs={'class':'log-diff'})
         #print(divs[1])
         nodes = []
@@ -47,16 +94,10 @@ class AnalyzeLog:
     def getTerminalInfo(self, testContainer):
         lblbls = testContainer.find_all(name='li',attrs={'class':'lblbl'})
         ct = lblbls[-1].string
-        lst = ct.split('-')
-        self.testSuite = lst[1]
-        start = lst[2].find('(')
-        end = lst[2].find(')')
-        self.radioType = lst[2][start+1:end]
-        start = lst[2].find('Terminal')
-        temp = lst[2][start:]
-        templst = temp.split(' ')
-        self.terminal= int(templst[1])
-        #print(info)
+        single = self.getSplitInfo(ct)
+        self.testSuite = single[0]
+        self.radioType = single[1]
+        self.terminal= single[2]
 
     def generateTestcases(self, tcg):
         #print(tcg.span.string)
@@ -123,9 +164,10 @@ class AnalyzeLog:
             self.processNode(node)
             i += 1
             
-'''      
+      
 analyzeLog = AnalyzeLog()
-analyzeLog.process()
+analyzeLog.logDiffNodes()
+'''
 for testcase in analyzeLog.testcaseList:
     testcase.toString()
 '''
