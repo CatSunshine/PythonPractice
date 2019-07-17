@@ -148,7 +148,6 @@ def saveSections(analyzeLog, sht):
 def saveLeftNonMatch(leftNonMatch, sht, rows):
     if len(leftNonMatch) == 0:
         return rows
-    #print(leftNonMatch)
     flag = False
     tempTp = 0
     suites = ''
@@ -177,7 +176,6 @@ def saveLeftNonMatch(leftNonMatch, sht, rows):
     return rows + 1
 
 def saveRightNonMatch(rightNonMatch, sht, rows):
-    #print('rightNonMatch:',rightNonMatch)
     flag = False
     tempTp = 0
     for lst in rightNonMatch:
@@ -237,38 +235,52 @@ def generateCmd(wantedCases, name):
         outCmd.write('no case failed, do not need to rerun. \n')
         outCmd.close()
         return
-    prevLevelOneType = wantedCases[0].levelOneType
-    prevTerminal = wantedCases[0].terminal
-    radioType = wantedCases[0].radioType
-    suite = wantedCases[0].testSuite
-    caseStr = ' -t ' + wantedCases[0].caseName.strip()
-    caseCount = 1
-    if len(wantedCases) == 1:
-        outCmd.write(radioType + '\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
-        outCmd.close()
-        return
-    for wantedCase in wantedCases[1:]:
-        if wantedCase.levelOneType == prevLevelOneType: #same TP and xml suite
-            caseStr += ' -t ' + wantedCase.caseName.strip()
-            caseCount += 1
-        else:
-            if caseCount < 25:
-                outCmd.write(radioType +'\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
-                outCmd.write('\n')
-            else:
-                outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
-                outCmd.write('\n')
+    flag = False
+    caseCount = 0
+    prevLevelOneType = 0
+    prevTerminal = 0
+    radioType = ''
+    suite = ''
+    caseStr = ''
+    caseTotal = {'ElvisAuBootSSI.xml':6,'SwCharSuite.xml':3,'ElvisTrxCtrl.xml':7,\
+               'ElvisSmoke.xml':4,'ElvisRegression.xml':20,'ElvisTimeAlignment.xml':15}
+    for wantedCase in wantedCases:
+        if wantedCase.rightStatus == 'r_pending':
+            continue
+        if not flag:
             prevLevelOneType = wantedCase.levelOneType
             prevTerminal = wantedCase.terminal
             radioType = wantedCase.radioType
+            suite = wantedCase.testSuite
             caseStr = ' -t ' + wantedCase.caseName.strip()
             caseCount = 1
-            suite = wantedCase.testSuite
-    if caseCount < 10:
+            flag = True
+        else:
+            if wantedCase.levelOneType == prevLevelOneType: #same TP and xml suite
+                caseStr += ' -t ' + wantedCase.caseName.strip()
+                caseCount += 1
+            else: #different TP, save previous TP info first
+                total = caseTotal.get(suite, 21)
+                if caseCount <= total:
+                    outCmd.write(radioType +'\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+                    outCmd.write('\n')
+                else:
+                    outCmd.write('more than ' + str(total) + ' cases failed, suggest to rerun ' \
+                                 + suite +  ' on terminal ' + str(prevTerminal)+ ' for ' + radioType)
+                    outCmd.write('\n')
+                prevLevelOneType = wantedCase.levelOneType
+                prevTerminal = wantedCase.terminal
+                radioType = wantedCase.radioType
+                suite = wantedCase.testSuite
+                caseStr = ' -t ' + wantedCase.caseName.strip()
+                caseCount = 1
+    total = caseTotal.get(suite, 21)
+    if caseCount <= total:
         outCmd.write(radioType + '\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
         outCmd.write('\n')
     else:
-        outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
+        outCmd.write('more than ' + str(total) + ' cases failed, suggest to rerun '\
+                     + suite +  ' on terminal ' + str(prevTerminal) + ' for ' + radioType)
         outCmd.write('\n')
     outCmd.close()   
     
@@ -292,10 +304,6 @@ def getResult():
     analyzeLog.process()
     return analyzeLog.testcaseList
 
-#wantedCases = getResult()
-#generateExcel(wantedCases, 'R78Result')
-#generateCmd(wantedCases)
-
 def main(argv = None):
     if argv is None:
         argv = sys.argv
@@ -310,7 +318,7 @@ def main(argv = None):
 if __name__ == '__main__':
     #argv = ['', 'result']
     main()
-#todo:different xml suite set different case count
+#todo:different xml suite set different case count --done
 #todo:no-matching part --done
 #todo:add TR number and link --done
 #todo:optmize rerunCmd function

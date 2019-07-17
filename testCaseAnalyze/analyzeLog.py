@@ -72,13 +72,13 @@ class AnalyzeLog:
         divs = soup.find_all(name='div', attrs={'class':'log-diff'})
         #print(divs[1])
         nodes = []
-        divXml = open('divs.html', 'w',encoding='utf-8')
+        #divXml = open('divs.html', 'w',encoding='utf-8')
         for div in divs:
             if div.find_all(name='li', attrs={'class':'tcg-diff'}):
                 nodes.append(div)
-                divXml.writelines(div.prettify())
+                #divXml.writelines(div.prettify())
         doc.close()
-        divXml.close()
+        #divXml.close()
         print(len(nodes))
         return nodes
 
@@ -165,8 +165,8 @@ class AnalyzeLog:
             i += 1
             
       
-analyzeLog = AnalyzeLog()
-analyzeLog.process()
+#analyzeLog = AnalyzeLog()
+#analyzeLog.process()
 '''
 for testcase in analyzeLog.testcaseList:
     testcase.toString()
