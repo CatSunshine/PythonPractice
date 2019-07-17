@@ -147,7 +147,7 @@ def saveSections(analyzeLog, sht):
 
 def saveLeftNonMatch(leftNonMatch, sht, rows):
     if len(leftNonMatch) == 0:
-        return
+        return rows
     #print(leftNonMatch)
     flag = False
     tempTp = 0
@@ -231,19 +231,20 @@ def generateRerunCmd():
     generateCmd(wantedCases)
     
 #generateTestSuite -t sbpsC2_TC3_L -a 40
-def generateCmd(wantedCases):    
-    outCmd = open('rerunCmd.txt', 'w')
+def generateCmd(wantedCases, name):
+    outCmd = open(name + '_rerunCmd.txt', 'w')
     if len(wantedCases) == 0:
         outCmd.write('no case failed, do not need to rerun. \n')
         outCmd.close()
         return
     prevLevelOneType = wantedCases[0].levelOneType
     prevTerminal = wantedCases[0].terminal
+    radioType = wantedCases[0].radioType
     suite = wantedCases[0].testSuite
     caseStr = ' -t ' + wantedCases[0].caseName.strip()
     caseCount = 1
     if len(wantedCases) == 1:
-        outCmd.write('generateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+        outCmd.write(radioType + '\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
         outCmd.close()
         return
     for wantedCase in wantedCases[1:]:
@@ -251,19 +252,20 @@ def generateCmd(wantedCases):
             caseStr += ' -t ' + wantedCase.caseName.strip()
             caseCount += 1
         else:
-            if caseCount < 20:
-                outCmd.write('generateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+            if caseCount < 25:
+                outCmd.write(radioType +'\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
                 outCmd.write('\n')
             else:
                 outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
                 outCmd.write('\n')
             prevLevelOneType = wantedCase.levelOneType
             prevTerminal = wantedCase.terminal
+            radioType = wantedCase.radioType
             caseStr = ' -t ' + wantedCase.caseName.strip()
             caseCount = 1
             suite = wantedCase.testSuite
     if caseCount < 10:
-        outCmd.write('generateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
+        outCmd.write(radioType + '\ngenerateTestSuite' + caseStr + ' -a ' + str(prevTerminal))
         outCmd.write('\n')
     else:
         outCmd.write('more than 10 cases failed, suggest to rerun ' + suite +  ' on terminal ' + str(prevTerminal))
@@ -303,7 +305,7 @@ def main(argv = None):
         analyzeLog = AnalyzeLog()
         analyzeLog.process()
         generateExcel(analyzeLog, argv[1])
-        generateCmd(analyzeLog.testcaseList)
+        generateCmd(analyzeLog.testcaseList, argv[1])
 
 if __name__ == '__main__':
     #argv = ['', 'result']

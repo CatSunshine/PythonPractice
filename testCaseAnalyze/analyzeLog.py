@@ -65,7 +65,7 @@ class AnalyzeLog:
             #print(self.rightNonMatch)  
     
     def logDiffNodes(self):
-        doc = open('log_diffs', 'r')
+        doc = open('log_diffs', 'rb')
         soup = BeautifulSoup(doc, 'html.parser')
         self.getLeftNonMatch(soup.find(name='li', attrs={'class':'secondary secondary_testable'}))
         self.getRightNonMatch(soup.find(name='li', attrs={'class':'primary primary_testable'}))
@@ -132,7 +132,7 @@ class AnalyzeLog:
                     for span in spans:
                         #print("single span:",span)
                         if len(span.attrs) > 0 and span['class'][0] == 'known_issue':
-                            errorMsg = span.a.string + '\n'
+                            errorMsg += span.a.string + '\n'
                             #tc.errorMsg += span.a.string + '\n'
                             #print('first a type:',type(span.a))
                             #print("span a:", span.a)
@@ -148,7 +148,7 @@ class AnalyzeLog:
                         elif len(span.attrs) > 0 and span['class'][0] == 'tr':
                             tc.trNum = span.string
                         else:
-                            errorMsg = span.string + '\n'
+                            errorMsg += span.string + ' '
                             #tc.errorMsg += span.string+'\n'
                     if errorMsg not in tc.errorMsg:
                         tc.errorMsg.append(errorMsg)
@@ -166,7 +166,7 @@ class AnalyzeLog:
             
       
 analyzeLog = AnalyzeLog()
-analyzeLog.logDiffNodes()
+analyzeLog.process()
 '''
 for testcase in analyzeLog.testcaseList:
     testcase.toString()
