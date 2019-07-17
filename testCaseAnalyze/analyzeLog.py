@@ -3,6 +3,7 @@ __version__ = "1.0.1"
 
 from bs4 import BeautifulSoup
 from Testcase import Testcase
+import re
 #1.open html, get bs4, get log-diff nodes
 
 
@@ -148,7 +149,11 @@ class AnalyzeLog:
                         elif len(span.attrs) > 0 and span['class'][0] == 'tr':
                             tc.trNum = span.string
                         else:
-                            errorMsg += span.string + ' '
+                            mat = re.search(r"(\d{4}-\d{1,2}-\d{1,2})",span.string)
+                            if mat:
+                                errorMsg += span.string + ' '
+                            else:
+                                errorMsg += span.string + '\n'
                             #tc.errorMsg += span.string+'\n'
                     if errorMsg not in tc.errorMsg:
                         tc.errorMsg.append(errorMsg)
