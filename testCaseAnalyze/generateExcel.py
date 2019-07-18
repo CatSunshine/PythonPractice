@@ -44,7 +44,7 @@ def addNewCase(sht, rows, wantedCase):
         sht.range('C' + str(rows)).add_hyperlink(wantedCase.trlink, wantedCase.trNum, '')
     return rows+1
 
-def saveSections(analyzeLog, sht):   
+def saveSections(analyzeLog, sht):
     a1 = sht.range('A1')
     a1.column_width = 50
     b1 = sht.range('B1')
@@ -74,6 +74,13 @@ def saveSections(analyzeLog, sht):
     titleStyle(rng)
     rows += 1
     rows = saveSection('r_pass', 'r_missing', wantedCases, sht, rows)
+
+    print("save pass to pending")
+    rng = sht.range('A' + str(rows))
+    rng.value='Pass to pending'
+    titleStyle(rng)
+    rows += 1
+    rows = saveSection('r_pass', 'r_pending', wantedCases, sht, rows)
 
     print("save fail to fail")
     rng = sht.range('A' + str(rows))
@@ -130,6 +137,20 @@ def saveSections(analyzeLog, sht):
     titleStyle(rng)
     rows += 1
     rows = saveSection('r_fail', 'r_missing', wantedCases, sht, rows)
+
+    print("save pending to fail")
+    rng = sht.range('A' + str(rows))
+    rng.value='Pending to Fail'
+    titleStyle(rng)
+    rows += 1
+    rows = saveSection('r_pending', 'r_fail', wantedCases, sht, rows)
+
+    print("save pending to Error")
+    rng = sht.range('A' + str(rows))
+    rng.value='Pending to Error'
+    titleStyle(rng)
+    rows += 1
+    rows = saveSection('r_pending', 'r_error', wantedCases, sht, rows)
 
     print("save left non-matching")
     rng = sht.range('A' + str(rows))
