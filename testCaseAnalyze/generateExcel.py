@@ -124,7 +124,7 @@ def saveSections(analyzeLog, sht):
     rows += 1
     rows = saveSection('r_missing', 'r_error', wantedCases, sht, rows)
 
-    print("save not error to not executed")
+    print("save error to not executed")
     rng = sht.range('A' + str(rows))
     rng.value='Error to not Executed'
     titleStyle(rng)
