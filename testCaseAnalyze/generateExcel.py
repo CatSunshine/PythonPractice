@@ -264,7 +264,7 @@ def generateCmd(wantedCases, name):
     suite = ''
     caseStr = ''
     caseTotal = {'ElvisAuBootSSI.xml':6,'SwCharSuite.xml':3,'ElvisTrxCtrl.xml':7,\
-               'ElvisSmoke.xml':4,'ElvisRegression.xml':20,'ElvisTimeAlignment.xml':15}
+               'ElvisSmoke.xml':4,'ElvisRegression.xml':25,'ElvisTimeAlignment.xml':15}
     for wantedCase in wantedCases:
         if wantedCase.rightStatus == 'r_pending':
             continue
@@ -342,7 +342,7 @@ if __name__ == '__main__':
 #todo:different xml suite set different case count --done
 #todo:no-matching part --done
 #todo:add TR number and link --done
-#todo:optmize rerunCmd function
+#todo:optmize rerunCmd function --done
 
 '''
 app = xw.App(visible=False, add_book=False)

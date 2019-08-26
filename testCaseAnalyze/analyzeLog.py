@@ -4,9 +4,6 @@ __version__ = "1.0.1"
 from bs4 import BeautifulSoup
 from Testcase import Testcase
 import re
-#1.open html, get bs4, get log-diff nodes
-
-
 
 class AnalyzeLog:
     '''define tool class.'''
@@ -83,7 +80,6 @@ class AnalyzeLog:
         print(len(nodes))
         return nodes
 
-    #2.from log-diff nodes get testcases   
     def processNode(self, node):
         self.levelOneType += 1
         testContainer = node.find(name='ul', attrs={'class':'header test_container'})
@@ -129,21 +125,16 @@ class AnalyzeLog:
                 for errli in errorlis:
                     errorMsg = ''
                     spans = errli.find_all(name='span')
-                    #print('span len:',len(spans))
                     for span in spans:
                         #print("single span:",span)
                         if len(span.attrs) > 0 and span['class'][0] == 'known_issue':
                             errorMsg += span.a.string + '\n'
-                            #tc.errorMsg += span.a.string + '\n'
-                            #print('first a type:',type(span.a))
                             #print("span a:", span.a)
                             next_t = span.a.nextSibling
                             if not next_t:
                                 continue
                             while type(next_t)!=type(span.a) and next_t.nextSibling:
                                 next_t = next_t.nextSibling
-                            #print("next:",next_t)
-                            #print('second a type:',type(next_t))
                             if type(next_t)==type(span.a):
                                 tc.trlink = next_t['href']
                         elif len(span.attrs) > 0 and span['class'][0] == 'tr':
@@ -154,7 +145,6 @@ class AnalyzeLog:
                                 errorMsg += span.string + ' '
                             else:
                                 errorMsg += span.string + '\n'
-                            #tc.errorMsg += span.string+'\n'
                     if errorMsg not in tc.errorMsg:
                         tc.errorMsg.append(errorMsg)
             #tc.toString()
@@ -163,7 +153,6 @@ class AnalyzeLog:
     def process(self):
         nodes = self.logDiffNodes()
         i = 0
-        #self.processNode(nodes[4])
         for node in nodes:
             print(i)
             self.processNode(node)
