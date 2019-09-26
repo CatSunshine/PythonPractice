@@ -19,12 +19,14 @@ class AnalyzeLog:
         self.rightNonMatch = []
 
     def getSplitInfo(self, line):
+        start = line.string.find('(')
+        end = line.string.rfind(')')
+        info = line.string[start+1:end]
+        content = line.string.replace(info, '')
         single = []
-        lst = line.string.split('-')
+        lst = content.split('-')
         single.append(lst[1].strip())
-        start = lst[2].find('(')
-        end = lst[2].find(')')
-        single.append(lst[2][start+1:end])
+        single.append(info)
         start = lst[2].find('Terminal')
         temp = lst[2][start:]
         templst = temp.split(' ')
