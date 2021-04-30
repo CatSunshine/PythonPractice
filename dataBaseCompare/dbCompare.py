@@ -129,7 +129,7 @@ def compareResult(inputLists):
     wb.save('result.xlsx')
     wb.close()
     app.quit()
-    print('finisheds!')
+    print('finish!')
 
-inputLists = [['100M_3239_total_db.txt', 'nrTdd1000_Id18'], ['80M_3239_total_db.txt', 'nrTdd800_Id43']]
+inputLists = [['60M_3239_db.txt', '/nrTdd600_Id17'], ['80M_3239_total_db.txt', '/nrTdd800_Id43']]
 compareResult(inputLists)

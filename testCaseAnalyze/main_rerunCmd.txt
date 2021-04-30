@@ -1,0 +1,37 @@
+Radio 8823 B42G, R1B
+generateTestSuite -t testAlmInterfaceFaultHandling -a 163
+Radio 8836 B77A, R1A
+generateTestSuite -t testAlmInterfaceFaultHandling -a 403
+Radio 2460 24B8 24B20 24B28B, R1B
+generateTestSuite -t raisePartialHwFaultOnBranchAPrio1 -a 246
+Radio 4442 B1 B3, R1C
+generateTestSuite -t verifyTxLoAndNcoForDlCarrierFrequency -a 35
+Radio 2238 B8 B20 B28B, R1C
+generateTestSuite -t testPowerLost -a 243
+AIR 6488 B42F, R1B/A
+generateTestSuite -t testPowerLost -t After Suite -a 33
+more than 25 cases failed, suggest to rerun ElvisRegression.xml on terminal 163 for Radio 8823 B42G, R1B
+IRU 8844 8-Port LC, R1D
+generateTestSuite -t setupMaxSupportedCarriersLW -t testSetupMaxUlWcdmaCarriers -t testSetupMaxDlWcdmaCarriers -t carrierControlMixedModeLTEWCDMA20and15and5Mhztc4 -a 430
+Radio 4480 44B1 44B3 C, R1D
+generateTestSuite -t testTwoNonContiguousDlUlCarriersAllFullbandwidthsMaxPower -a 56
+more than 25 cases failed, suggest to rerun ElvisRegression.xml on terminal 403 for Radio 8836 B77A, R1A
+more than 25 cases failed, suggest to rerun ElvisRegression.xml on terminal 427 for Radio 4455 B2/B25 B66A, R1C
+AIR 1641 B2/B25A B66A, R1A
+generateTestSuite -t testDlCarrier20000KHz23040H -a 38
+more than 25 cases failed, suggest to rerun ElvisRegression.xml on terminal 63 for Radio 2260 22B1 22B3 C, R1C
+AIR 6454 B41K, R1A
+generateTestSuite -t rtmTestDlFilterXenonAASNr20_40_100 -t RtmDlData -a 10
+AIR 6454 B41K, R1A
+generateTestSuite -t RtmDlDataMixMode -a 216
+AIR 6488 B42F, R1E
+generateTestSuite -t tcBranchSupervisionAndImpactFaults -t rtmTestDlFilterXenonAASNr20_40_100 -t RtmDlData -t tcRtmDlUlFilterXenonMultiCarrierNR20xNR80 -a 7
+Radio 8823 B42G, R1B
+generateTestSuite -t dciCoverageTC -t testCarrierStateTransitionOperations -a 163
+Radio 8836 B77A, R1A
+generateTestSuite -t dciCoverageTC -t testCarrierStateTransitionOperations -a 403
+Radio 8823 B42G, R1B
+generateTestSuite -t testDlTaStaticDelayBudgetLteNrTdd -t testDlTaLinkToggling -a 163
+more than 21 cases failed, suggest to rerun NRFddSSI.xml on terminal 63 for Radio 2260 22B1 22B3 C, R1C
+IRU 8844 8-Port LC, R1D
+generateTestSuite -t lteFddSwChar -a 430
